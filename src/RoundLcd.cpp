@@ -1,7 +1,6 @@
 
 #define GIF_FILENAME "/ezgif.com-gif-maker.gif"
 
-
 #include <Arduino_GFX_Library.h>
 
 #define GFX_BL 22 // default backlight pin, you may replace DF_GFX_BL to actual backlight pin
@@ -51,7 +50,7 @@ void loop() {
         uint32_t duration = 0, remain = 0;
         while (res > 0){
           t_fstart = millis();
-          t_delay = gif->gce.delay * 10;
+          t_delay = gif->gce.delay * 5;
           res = gifClass.gd_get_frame(gif, buf);
           if (res < 0){
             break;
