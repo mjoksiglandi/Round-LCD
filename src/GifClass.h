@@ -129,6 +129,11 @@ public:
         gif_buf_read(fd, &aspect, 1);
         /* Create gd_GIF Structure. */
         gif = (gd_GIF *)calloc(1, sizeof(*gif));
+        if (!gif)
+        {
+            Serial.println(F("gif malloc failed"));
+            return NULL;
+        }
         gif->fd = fd;
         gif->width = width;
         gif->height = height;
@@ -139,6 +144,11 @@ public:
         gif->bgindex = bgidx;
         gif->anim_start = file_pos; // fd->position();
         gif->table = new_table();
+        if (!gif->table)
+        {
+            free(gif);
+            return NULL;
+        }
         return gif;
     }
 
@@ -409,6 +419,7 @@ private:
         {
             Serial.print(F("new_table() malloc failed: "));
             Serial.println(s);
+            return NULL;
         }
         table->entries = (gd_Entry *)&table[1];
         return table;
