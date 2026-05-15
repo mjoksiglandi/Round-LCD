@@ -34,9 +34,18 @@ Firmware PlatformIO para ESP32 DOIT DevKit V1. El proyecto esta evolucionando de
 
 ## FreeRTOS
 
-- `uiTask`: refresca la cara cada `50 ms`.
-- `systemTask`: publica estado basico por serial cada `500 ms`.
+- `uiTask`: evalua la cara cada `50 ms`, pero solo redibuja cuando cambia una expresion o un detalle pequeno de ojos.
+- `systemTask`: publica estado basico por serial cada `2000 ms`.
 - `loop()`: queda libre y solo cede tiempo al scheduler.
+
+## Pantalla y color
+
+El modulo GC9A01 probado requiere compensacion de color en software:
+`DisplayInvertColorsInSoftware = true` y `DisplaySwapRedBlueInSoftware = true`.
+La pantalla queda a `10 MHz` de SPI para reducir glitches de lineas con el
+cableado actual. Si cambias de modulo, activa `DisplayColorCalibration` en
+`include/AppConfig.h` para mostrar la grilla `R/G/B/C/M/Y/W` al arranque y
+ajustar los flags sin tocar `FaceRenderer`.
 
 ## SD
 
@@ -61,6 +70,13 @@ pio device monitor
 ```
 
 La velocidad del monitor serial es `115200`.
+
+## Flujo de firmware
+
+El flujo operativo para cambios de firmware queda documentado en
+[`docs/firmware-workflow.md`](docs/firmware-workflow.md). Usalo para definir
+alcance, validacion, evidencia y criterios de cierre antes de marcar un cambio
+como listo.
 
 ## Dependencias
 

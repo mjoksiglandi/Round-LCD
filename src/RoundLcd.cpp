@@ -78,7 +78,7 @@ void setup()
 
   if (!storage.begin())
   {
-    faceController.setExpression(FaceExpression::Thinking);
+    faceController.notifyStorageMissing();
   }
 
   createTask(

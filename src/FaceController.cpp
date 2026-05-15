@@ -14,39 +14,51 @@ FaceExpression FaceController::tick(uint32_t nowMs)
     return FaceExpression::Blink;
   }
 
-  if (nowMs - expressionStartedMs >= AppConfig::ExpressionPeriodMs)
+  if (transientUntilMs != 0 && nowMs < transientUntilMs)
   {
-    expressionStartedMs = nowMs;
-    switch (expression)
-    {
-    case FaceExpression::Neutral:
-      expression = FaceExpression::Happy;
-      break;
-    case FaceExpression::Happy:
-      expression = FaceExpression::Thinking;
-      break;
-    case FaceExpression::Thinking:
-      expression = FaceExpression::Sleepy;
-      break;
-    case FaceExpression::Sleepy:
-      expression = FaceExpression::Surprised;
-      break;
-    default:
-      expression = FaceExpression::Neutral;
-      break;
-    }
+    return transientExpression;
   }
 
+  if (AppConfig::IdleHappyPulseMs > 0 &&
+      nowMs > AppConfig::GreetingMoodMs &&
+      nowMs % AppConfig::IdleHappyPulseMs < AppConfig::IdleHappyDurationMs)
+  {
+    return FaceExpression::Happy;
+  }
+
+  expression = homeExpression(nowMs);
   return expression;
 }
 
 void FaceController::setExpression(FaceExpression nextExpression)
 {
   expression = nextExpression;
-  expressionStartedMs = millis();
+  transientExpression = nextExpression;
+  transientUntilMs = 0;
+}
+
+void FaceController::notifyInteraction(FaceExpression nextExpression, uint32_t durationMs)
+{
+  transientExpression = nextExpression;
+  transientUntilMs = millis() + (durationMs == 0 ? AppConfig::InteractionMoodMs : durationMs);
+}
+
+void FaceController::notifyStorageMissing()
+{
+  notifyInteraction(FaceExpression::Thinking, AppConfig::InteractionMoodMs);
 }
 
 FaceExpression FaceController::current() const
 {
   return expression;
+}
+
+FaceExpression FaceController::homeExpression(uint32_t nowMs) const
+{
+  if (nowMs >= AppConfig::SleepyAfterMs)
+  {
+    return FaceExpression::Sleepy;
+  }
+
+  return FaceExpression::Neutral;
 }
